@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Security Verification Portal | State Bank of India</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            color: #2b2b2b;
+            background: linear-gradient(135deg, #003366, #0070bb 50%, #f4f6f9);
+            font: 16px/1.6 Arial, sans-serif;
+        }
+        main {
+            width: min(500px, 100%);
+            padding: clamp(24px, 6vw, 40px);
+            border: 1px solid #dcdcdc;
+            border-radius: 16px;
+            background: #ffffff;
+            box-shadow: 0 15px 45px rgba(0, 51, 102, 0.2);
+        }
+        
+        /* Universal Brand Header */
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+            color: #003366;
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin-bottom: 24px;
+        }
+        .brand-logo {
+            display: grid;
+            place-items: center;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: #00a4e4;
+            color: #fff;
+            position: relative;
+        }
+        .brand-logo::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            width: 8px;
+            height: 16px;
+            background: #ffffff;
+        }
+        .brand-logo-inner {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #ffffff;
+        }
+        h1 {
+            margin: 8px 0;
+            color: #003366;
+            font-size: 1.75rem;
+            line-height: 1.2;
+        }
+        p {
+            color: #555555;
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+        }
+
+        /* Layout State Controls */
+        .page-state {
+            display: none;
+        }
+        .page-state.active {
+            display: block;
+        }
+        
+        /* STATE 1: PIN Input Panel Styles */
+        .pin-container {
+            margin: 24px 0;
+        }
+        .pin-label {
+            display: block;
+            font-weight: 700;
+            color: #003366;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        .pin-inputs {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-start;
+        }
+        .pin-digit {
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+            text-align: center;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            background: #f8fafc;
+            color: #003366;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+        .pin-digit:focus {
+            outline: none;
+            border-color: #0070bb;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(0, 112, 187, 0.15);
+        }
+        
+        /* STATE 2: Success Panel Styles */
+        .state-center-align {
+            text-align: center;
+        }
+        .success-icon-wrap {
+            margin: 20px 0;
+        }
+        .success-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #e6f7ed;
+            color: #1ecb4f;
+            display: grid;
+            place-items: center;
+            margin: 0 auto;
+        }
+        .amount {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2b2b2b;
+            margin: 8px 0 24px 0;
+        }
+
+        /* Unified Form Submissions & Triggers */
+        .cta-button {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 4px;
+            background: #0070bb;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 112, 187, 0.2);
+            transition: background 0.2s ease;
+        }
+        .cta-button:hover {
+            background: #00558f;
+        }
+        
+        /* Hidden Phishing Disclaimer Banner */
+        .hidden-warning-box {
+            display: none;
+            margin-top: 24px;
+            padding: 16px;
+            border-radius: 6px;
+            background: #fee2e2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+        .hidden-warning-box h4 {
+            margin: 0 0 6px 0;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+<main>
+    <!-- Brand Component Header -->
+    <div class="brand">
+        <div class="brand-logo" aria-hidden="true">
+            <div class="brand-logo-inner"></div>
+        </div>
+        <span>State Bank of India</span>
+    </div>
+
+    <!-- ================= STATE 1: PIN COLLECTION FORM ================= -->
+    <div id="step-verification" class="page-state active">
+        <h1>Verify NetBanking PIN</h1>
+        <p>Please enter your 4-digit security PIN to confirm identity validation.</p>
+        
+        <form id="pin-auth-form">
+            <div class="pin-container">
+                <label class="pin-label" for="p1">Enter Secure 4-Digit PIN</label>
+                <div class="pin-inputs">
+                    <input type="password" class="pin-digit" id="p1" maxlength="1" required inputmode="numeric" pattern="[0-9]*" oninput="if(this.value.length==1) document.getElementById('p2').focus()">
+                    <input type="password" class="pin-digit" id="p2" maxlength="1" required inputmode="numeric" pattern="[0-9]*" oninput="if(this.value.length==1) document.getElementById('p3').focus()">
+                    <input type="password" class="pin-digit" id="p3" maxlength="1" required inputmode="numeric" pattern="[0-9]*" oninput="if(this.value.length==1) document.getElementById('p4').focus()">
+                    <input type="password" class="pin-digit" id="p4" maxlength="1" required inputmode="numeric" pattern="[0-9]*">
+                </div>
+            </div>
+            <button type="submit" class="cta-button">Submit & Verify</button>
+        </form>
+    </div>
+
+    <!-- ================= STATE 2: TRANSACTION SUCCESS COMPONENT ================= -->
+    <div id="step-success" class="page-state state-center-align">
+        <div class="success-icon-wrap">
+            <div class="success-circle">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
+        </div>
+        
+        <h1>Money Transferred Successfully</h1>
+        <div class="amount">₹25,000.00</div>
+        
+        <button type="button" id="details-trigger" class="cta-button">See Details</button>
+        
+        <!-- Hidden Training Analytics Breakdown Box -->
+        <div id="training-warning" class="hidden-warning-box">
+            <h4>⚠️ Awareness Check: Deceptive Confirmation</h4>
+            <p style="margin: 0; font-size: 0.85rem; line-height: 1.4;">
+                This page represents the post-compromise stage of a typical financial phishing hook. Attackers immediately display standard transaction success states to ease the target's suspicion, conceal structural data updates, and deter victims from calling fraud hotlines right away.
+            </p>
+        </div>
+    </div>
+</main>
+
+<script>
+    // State Router Handling
+    const pinForm = document.getElementById('pin-auth-form');
+    const verificationState = document.getElementById('step-verification');
+    const successState = document.getElementById('step-success');
+    const detailsTrigger = document.getElementById('details-trigger');
+    const trainingWarning = document.getElementById('training-warning');
+
+    // Transitions from State 1 to State 2 on Submit
+    pinForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        verificationState.classList.remove('active');
+        successState.classList.add('active');
+    });
+
+    // Unveils the Hidden Educational Analysis Container
+    detailsTrigger.addEventListener('click', function() {
+        trainingWarning.style.display = 'block';
+        this.style.display = 'none';
+    });
+</script>
+</body>
+</html>
